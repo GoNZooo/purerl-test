@@ -29,19 +29,6 @@ startLink = Supervisor.startLink (Just $ Local $ atom supervisorName) $ pure sup
   intensity = 3
   period = Seconds 5.0
 
---   childSpecs = ErlList.fromFoldable
---     [ SupervisorHelpers.worker "Qlog.Repo" RestartPermanent repo_start_link
---     , SupervisorHelpers.worker "Qlog.Web" RestartPermanent $ Web.startLink {}
---     , SupervisorHelpers.worker "Qlog.Mimer" RestartPermanent $ Mimer.startLink
---     ]
---   flags = { strategy, intensity, period }
---   strategy = Supervisor.OneForOne
---   intensity = 3
---   period = Seconds 5.0
---
--- foreign import repo_start_link
---   :: forall cont stop message state. Effect (StartLinkResult (ServerPid cont stop message state))
-
 foreign import runner_start_link
   :: forall cont stop message state
    . Effect (StartLinkResult (GenServer.ServerPid cont stop message state))

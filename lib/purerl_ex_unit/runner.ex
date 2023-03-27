@@ -11,46 +11,103 @@ defmodule PurerlExUnit.Runner do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  def execute(test_name, assertion) do
+  def execute(test_name, index, assertion) do
     GenServer.call(
       __MODULE__,
-      {:execute, %{test_name: test_name, assertion: assertion}}
+      {:execute, %{test_name: test_name, assertion: assertion, index: index}}
     )
   end
 
   def init(:ok) do
-    Application.ensure_started(:ex_unit)
-
     {:ok, %{}}
   end
 
-  def handle_call({:execute, %{test_name: test_name, assertion: {:assert, true}}}, _from, state) do
-    IO.puts("  ✅ #{test_name}")
+  def handle_call({:execute, %{assertion: {:assert, true}} = test_data}, _from, state) do
+    output_success(test_data)
 
     {:reply, :ok, state}
   end
 
-  def handle_call({:execute, %{test_name: test_name, assertion: {:assert, false}}}, _from, state) do
-    IO.puts("  ❌ #{test_name}")
+  def handle_call({:execute, %{assertion: {:assert, false}} = test_data}, _from, state) do
+    output_failure(test_data)
+
+    {:reply, :error, state}
+  end
+
+  def handle_call({:execute, %{assertion: {:refute, false}} = test_data}, _from, state) do
+    output_success(test_data)
+
+    {:reply, :ok, state}
+  end
+
+  def handle_call({:execute, %{assertion: {:refute, true}} = test_data}, _from, state) do
+    output_failure(test_data)
 
     {:reply, :error, state}
   end
 
   def handle_call(
-        {:execute,
-         %{test_name: test_name, assertion: {:assertEqual, %{left: left, right: right}}}},
+        {:execute, %{assertion: {:assertEqual, %{left: left, right: right}}} = test_data},
         _from,
         state
       ) do
-    if left == right do
-      IO.puts("  ✅ #{test_name}")
+    run_assertion(test_data, left, right, &Kernel.==/2, state)
+  end
+
+  def handle_call(
+        {:execute, %{assertion: {:assertNotEqual, %{left: left, right: right}}} = test_data},
+        _from,
+        state
+      ) do
+    run_assertion(test_data, left, right, &Kernel.!=/2, state)
+  end
+
+  def handle_call(
+        {:execute, %{assertion: {:assertGreaterThan, %{left: left, right: right}}} = test_data},
+        _from,
+        state
+      ) do
+    run_assertion(test_data, left, right, &Kernel.>/2, state)
+  end
+
+  def handle_call(
+        {:execute, %{assertion: {:assertLessThan, %{left: left, right: right}}} = test_data},
+        _from,
+        state
+      ) do
+    run_assertion(test_data, left, right, &Kernel.</2, state)
+  end
+
+  def handle_call(
+        {
+          :execute,
+          %{assertion: {:assertGreaterThanOrEqual, %{left: left, right: right}}} = test_data
+        },
+        _from,
+        state
+      ) do
+    run_assertion(test_data, left, right, &Kernel.>=/2, state)
+  end
+
+  def handle_call(
+        {:execute,
+         %{assertion: {:assertLessThanOrEqual, %{left: left, right: right}}} = test_data},
+        _from,
+        state
+      ) do
+    run_assertion(test_data, left, right, &Kernel.<=/2, state)
+  end
+
+  defp run_assertion(test_data, left, right, op, state) do
+    if op.(left, right) do
+      output_success(test_data)
 
       {:reply, :ok, state}
     else
-      IO.puts("  ❌ #{test_name}")
+      output_failure(test_data)
 
       try do
-        Assertions.assert(left == right)
+        Assertions.assert(op.(left, right))
       rescue
         e in ExUnit.AssertionError ->
           IO.puts("    #{e.message}")
@@ -58,9 +115,7 @@ defmodule PurerlExUnit.Runner do
           %{left: left, right: right} =
             e
             |> ExUnit.Formatter.format_assertion_diff(0, 80, &formatter/2)
-            |> Enum.map(fn {key, value} ->
-              {key, Enum.join(value)}
-            end)
+            |> Enum.map(fn {key, value} -> {key, Enum.join(value)} end)
             |> Enum.into(%{})
 
           IO.puts("    Left:\t#{left}\n    Right:\t#{right}")
@@ -68,10 +123,26 @@ defmodule PurerlExUnit.Runner do
           {:reply, :error, state}
 
         e ->
-          IO.puts("    #{inspect(e)}")
+          IO.puts("    Unknown exception: #{inspect(e)}")
           {:reply, :error, state}
       end
     end
+  end
+
+  defp output_success(%{} = test_data) do
+    output_test_result(:success, test_data)
+  end
+
+  defp output_failure(%{} = test_data) do
+    output_test_result(:failure, test_data)
+  end
+
+  defp output_test_result(:success, %{test_name: test_name, index: index}) do
+    IO.puts("  ✅ #{test_name} [#{index}]")
+  end
+
+  defp output_test_result(:failure, %{test_name: test_name, index: index}) do
+    IO.puts("  ❌ #{test_name} [#{index}]")
   end
 
   defp formatter(:diff_enabled?, _default), do: true
