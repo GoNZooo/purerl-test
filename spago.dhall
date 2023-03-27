@@ -13,14 +13,21 @@ to generate this file without the comments in this block.
 { name = "purerl-ex-unit"
 , dependencies =
   [ "arrays"
+  , "console"
   , "datetime"
   , "effect"
   , "erl-atom"
   , "erl-lists"
+  , "erl-maps"
   , "erl-pinto"
+  , "erl-process"
+  , "foldable-traversable"
   , "foreign"
   , "maybe"
   , "prelude"
+  , "refs"
+  , "transformers"
+  , "tuples"
   ]
 , packages = ./packages.dhall
 , sources = [ "src/**/*.purs", "test/**/*.purs" ]
