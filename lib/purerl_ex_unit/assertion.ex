@@ -1,6 +1,15 @@
 defmodule PurerlExUnit.Assertion do
   require ExUnit.Assertions, as: Assertions
 
+  @runnable_assertions [
+    :assertEqual,
+    :assertNotEqual,
+    :assertGreaterThan,
+    :assertLessThan,
+    :assertGreaterThanOrEqual,
+    :assertLessThanOrEqual
+  ]
+
   def execute({:assert, true}, _index, _test_name), do: {:assertionPassed}
 
   def execute({:assert, false}, index, test_name) do
@@ -37,7 +46,8 @@ defmodule PurerlExUnit.Assertion do
     run_assertion(assertion, &Kernel.<=/2, index, test_name)
   end
 
-  defp run_assertion({_assertion_type, %{left: left, right: right}}, op, index, test_name) do
+  defp run_assertion({assertion_type, %{left: left, right: right}}, op, index, test_name)
+       when assertion_type in @runnable_assertions do
     if op.(left, right) do
       {:assertionPassed}
     else
