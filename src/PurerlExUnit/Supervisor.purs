@@ -14,6 +14,8 @@ import Pinto.Supervisor (SupervisorPid)
 import Pinto.Supervisor as Supervisor
 import Pinto.Supervisor.Helpers as SupervisorHelpers
 import Pinto.Types (RegistryName(..), StartLinkResult)
+import PurerlExUnit.Suite.Supervisor as SuiteSupervisor
+import PurerlExUnit.Test.Supervisor as TestSupervisor
 
 startLink :: Effect (StartLinkResult SupervisorPid)
 startLink = Supervisor.startLink (Just $ Local $ atom supervisorName) $ pure supervisorSpec
@@ -23,6 +25,8 @@ startLink = Supervisor.startLink (Just $ Local $ atom supervisorName) $ pure sup
   childSpecs =
     ErlList.fromFoldable
       [ SupervisorHelpers.worker "PurerlExUnit.Runner" runner_start_link
+      , SupervisorHelpers.worker "PurerlExUnit.Suite.Supervisor" SuiteSupervisor.startLink
+      , SupervisorHelpers.worker "PurerlExUnit.Test.Supervisor" TestSupervisor.startLink
       ]
   flags = { strategy, intensity, period }
   strategy = Supervisor.OneForOne
