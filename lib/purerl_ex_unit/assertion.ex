@@ -10,6 +10,15 @@ defmodule PurerlExUnit.Assertion do
     :assertLessThanOrEqual
   ]
 
+  @assertion_operators %{
+    :assertEqual => &Kernel.==/2,
+    :assertNotEqual => &Kernel.!=/2,
+    :assertGreaterThan => &Kernel.>/2,
+    :assertLessThan => &Kernel.</2,
+    :assertGreaterThanOrEqual => &Kernel.>=/2,
+    :assertLessThanOrEqual => &Kernel.<=/2
+  }
+
   def execute({:assert, true}, _index, _test_name), do: {:assertionPassed}
 
   def execute({:assert, false}, index, test_name) do
@@ -22,28 +31,9 @@ defmodule PurerlExUnit.Assertion do
     {:assertionFailed, %{index: index, message: "  ❌ #{test_name} [#{index}]"}}
   end
 
-  def execute({:assertEqual, %{}} = assertion, index, test_name) do
-    run_assertion(assertion, &Kernel.==/2, index, test_name)
-  end
-
-  def execute({:assertNotEqual, %{}} = assertion, index, test_name) do
-    run_assertion(assertion, &Kernel.!=/2, index, test_name)
-  end
-
-  def execute({:assertGreaterThan, %{}} = assertion, index, test_name) do
-    run_assertion(assertion, &Kernel.>/2, index, test_name)
-  end
-
-  def execute({:assertLessThan, %{}} = assertion, index, test_name) do
-    run_assertion(assertion, &Kernel.</2, index, test_name)
-  end
-
-  def execute({:assertGreaterThanOrEqual, %{}} = assertion, index, test_name) do
-    run_assertion(assertion, &Kernel.>=/2, index, test_name)
-  end
-
-  def execute({:assertLessThanOrEqual, %{}} = assertion, index, test_name) do
-    run_assertion(assertion, &Kernel.<=/2, index, test_name)
+  def execute({assertion_type, %{}} = assertion, index, test_name)
+      when assertion_type in @runnable_assertions do
+    run_assertion(assertion, @assertion_operators[assertion_type], index, test_name)
   end
 
   defp run_assertion({assertion_type, %{left: left, right: right}}, op, index, test_name)
