@@ -1,24 +1,6 @@
 defmodule PurerlExUnit.Assertion do
   require ExUnit.Assertions, as: Assertions
 
-  @runnable_assertions [
-    :assertEqual,
-    :assertNotEqual,
-    :assertGreaterThan,
-    :assertLessThan,
-    :assertGreaterThanOrEqual,
-    :assertLessThanOrEqual
-  ]
-
-  @assertion_operators %{
-    :assertEqual => &Kernel.==/2,
-    :assertNotEqual => &Kernel.!=/2,
-    :assertGreaterThan => &Kernel.>/2,
-    :assertLessThan => &Kernel.</2,
-    :assertGreaterThanOrEqual => &Kernel.>=/2,
-    :assertLessThanOrEqual => &Kernel.<=/2
-  }
-
   def execute({:assert, true}, _index, _test_name), do: {:assertionPassed}
 
   def execute({:assert, false}, index, test_name) do
@@ -31,35 +13,53 @@ defmodule PurerlExUnit.Assertion do
     {:assertionFailed, %{index: index, message: "  ❌ #{test_name} [#{index}]"}}
   end
 
-  def execute({assertion_type, %{}} = assertion, index, test_name)
-      when assertion_type in @runnable_assertions do
-    run_assertion(assertion, @assertion_operators[assertion_type], index, test_name)
+  def execute({:assertEqual, %{left: left, right: right}}, index, test_name) do
+    run_assertion(fn -> Assertions.assert(left == right) end, index, test_name)
   end
 
-  defp run_assertion({assertion_type, %{left: left, right: right}}, op, index, test_name)
-       when assertion_type in @runnable_assertions do
-    if op.(left, right) do
+  def execute({:assertNotEqual, %{left: left, right: right}}, index, test_name) do
+    run_assertion(fn -> Assertions.assert(left != right) end, index, test_name)
+  end
+
+  def execute({:assertGreaterThan, %{left: left, right: right}}, index, test_name) do
+    run_assertion(fn -> Assertions.assert(left > right) end, index, test_name)
+  end
+
+  def execute({:assertLessThan, %{left: left, right: right}}, index, test_name) do
+    run_assertion(fn -> Assertions.assert(left < right) end, index, test_name)
+  end
+
+  def execute({:assertGreaterThanOrEqual, %{left: left, right: right}}, index, test_name) do
+    run_assertion(fn -> Assertions.assert(left >= right) end, index, test_name)
+  end
+
+  def execute({:assertLessThanOrEqual, %{left: left, right: right}}, index, test_name) do
+    run_assertion(fn -> Assertions.assert(left <= right) end, index, test_name)
+  end
+
+  defp run_assertion(assertion_closure, index, test_name) do
+    try do
+      assertion_closure.()
+
       {:assertionPassed}
-    else
-      try do
-        Assertions.assert(op.(left, right))
-      rescue
-        e in ExUnit.AssertionError ->
-          %{left: left, right: right} =
-            e
-            |> ExUnit.Formatter.format_assertion_diff(0, 80, &formatter/2)
-            |> Enum.map(fn {key, value} -> {key, Enum.join(value)} end)
-            |> Enum.into(%{})
+    rescue
+      e in ExUnit.AssertionError ->
+        IO.puts("    #{e.message}")
 
-          message = failure_message(test_name, index, "Left:\t#{left}\n    Right:\t#{right}")
+        %{left: left, right: right} =
+          e
+          |> ExUnit.Formatter.format_assertion_diff(0, 80, &formatter/2)
+          |> Enum.map(fn {key, value} -> {key, Enum.join(value)} end)
+          |> Enum.into(%{})
 
-          {:assertionFailed, %{index: index, message: message}}
+        message = failure_message(test_name, index, "Left:\t#{left}\n    Right:\t#{right}")
 
-        e ->
-          message = failure_message(test_name, index, "Unknown exception: #{inspect(e)}")
+        {:assertionFailed, %{index: index, message: message}}
 
-          {:assertionFailed, %{index: index, message: message}}
-      end
+      e ->
+        message = failure_message(test_name, index, "Unknown exception: #{inspect(e)}")
+
+        {:assertionFailed, %{index: index, message: message}}
     end
   end
 
