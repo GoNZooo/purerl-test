@@ -7,6 +7,7 @@ import Prelude
 import Control.Monad.Reader as Reader
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
+import Data.Newtype (wrap)
 import Data.TraversableWithIndex (traverseWithIndex)
 import Effect (Effect)
 import Effect.Class (liftEffect)
@@ -16,6 +17,7 @@ import Foreign as Foreign
 import Pinto (RegistryName(..), StartLinkResult)
 import Pinto.GenServer (InfoFn, InitFn, InitResult(..), ServerSpec)
 import Pinto.GenServer as GenServer
+import Pinto.Timer as Timer
 import PurerlExUnit.Suite.Bus as SuiteBus
 import PurerlExUnit.Test.Types (Arguments, Message(..), Pid, ServerType', State)
 import PurerlExUnit.Types
@@ -41,7 +43,9 @@ spec arguments = do
   (arguments # init # GenServer.defaultSpec) { name = Just name, handleInfo = Just handleInfo }
 
 init :: Arguments -> InitFn Unit Unit Message State
-init { suiteName, test } = { suiteName, test } # InitOk # pure
+init { suiteName, test } = do
+  _timerRef <- Timer.sendAfter (wrap 0.0) Initialize
+  { suiteName, test } # InitOk # pure
 
 handleInfo :: InfoFn Unit Unit Message State
 handleInfo Initialize state = do
@@ -53,7 +57,7 @@ runAssertions suiteName testName assertions = do
   assertionsRef <- [] # Ref.new # liftEffect
   Reader.runReaderT assertions assertionsRef
   assertions' <- assertionsRef # Ref.read # liftEffect
-  assertionResults <- traverseWithIndex (\i a -> executeAssertion a i) assertions'
+  assertionResults <- traverseWithIndex (\i a -> executeAssertion a i testName) assertions'
   let assertionFailures = assertionFailureData assertionResults
   if Array.null assertionFailures then
     { test: testName } # TestDone # SuiteBus.send suiteName
@@ -67,7 +71,7 @@ assertionFailureData results = do
     stripFailureData AssertionPassed = Nothing
   results # map stripFailureData # Array.catMaybes
 
-executeAssertion :: Assertion Foreign -> Int -> Effect AssertionResult
-executeAssertion assertion index = executeAssertion_ assertion index
+executeAssertion :: Assertion Foreign -> Int -> TestName -> Effect AssertionResult
+executeAssertion assertion index testName = executeAssertion_ assertion index testName
 
-foreign import executeAssertion_ :: Assertion Foreign -> Int -> Effect AssertionResult
+foreign import executeAssertion_ :: Assertion Foreign -> Int -> TestName -> Effect AssertionResult

@@ -7,25 +7,25 @@ import Prelude
 import Control.Monad.Reader as Reader
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
-import Data.Newtype (unwrap)
+import Data.Newtype (unwrap, wrap)
 import Data.Traversable (traverse_)
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
 import Effect.Class.Console as Console
 import Effect.Ref as Ref
 import Erl.Atom as Atom
-import Erl.Data.Map as Map
 import Erl.Data.Tuple (tuple2)
 import Erl.Process (class HasSelf)
 import Erl.Process as Process
 import Foreign as Foreign
 import Pinto (RegistryName(..), StartLinkResult)
-import Pinto.GenServer (Action(..), CastFn, InfoFn, InitFn, InitResult(..), ServerSpec)
+import Pinto.GenServer (Action(..), InfoFn, InitFn, InitResult(..), ServerSpec)
 import Pinto.GenServer as GenServer
+import Pinto.Timer as Timer
 import PurerlExUnit.Suite.Bus as SuiteBus
 import PurerlExUnit.Suite.Types (Arguments, Message(..), Pid, ServerType', State)
 import PurerlExUnit.Test.Supervisor as TestSupervisor
-import PurerlExUnit.Types (SuiteName, Test, TestName(..), TestResult(..), Tests, AssertionFailure)
+import PurerlExUnit.Types (AssertionFailure, SuiteName, Test, TestName, TestResult(..), Tests)
 
 serverName :: SuiteName -> RegistryName ServerType'
 serverName name =
@@ -43,6 +43,7 @@ spec arguments = do
 init :: Arguments -> InitFn Unit Unit Message State
 init { suite } = do
   _subscriptionRef <- SuiteBus.subscribe suite.name IncomingTestResult
+  _timerRef <- Timer.sendAfter (wrap 0.0) Initialize
   { suite, testCount: 0, successes: 0, failures: [] } # InitOk # pure
 
 handleInfo :: InfoFn Unit Unit Message State

@@ -24,8 +24,7 @@ startLink = Supervisor.startLink (Just $ Local $ atom supervisorName) $ pure sup
   supervisorName = "PurerlExUnit.Supervisor"
   childSpecs =
     ErlList.fromFoldable
-      [ SupervisorHelpers.worker "PurerlExUnit.Runner" runner_start_link
-      , SupervisorHelpers.worker "PurerlExUnit.Suite.Supervisor" SuiteSupervisor.startLink
+      [ SupervisorHelpers.worker "PurerlExUnit.Suite.Supervisor" SuiteSupervisor.startLink
       , SupervisorHelpers.worker "PurerlExUnit.Test.Supervisor" TestSupervisor.startLink
       ]
   flags = { strategy, intensity, period }

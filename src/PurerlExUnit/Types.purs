@@ -15,7 +15,9 @@ module PurerlExUnit.Types
 import Prelude
 
 import Control.Monad.Reader (ReaderT)
+import Data.Generic.Rep (class Generic)
 import Data.Newtype (class Newtype)
+import Data.Show.Generic (genericShow)
 import Effect (Effect)
 import Effect.Ref (Ref)
 import Foreign (Foreign)
@@ -37,6 +39,11 @@ data TestResult
 data AssertionResult
   = AssertionPassed
   | AssertionFailed { index :: Int, message :: String }
+
+derive instance Generic AssertionResult _
+
+instance Show AssertionResult where
+  show = genericShow
 
 type AssertionFailure = { index :: Int, message :: String }
 
