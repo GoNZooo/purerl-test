@@ -9,11 +9,11 @@ import Data.Time.Duration (Seconds(..))
 import Effect (Effect)
 import Erl.Atom (atom)
 import Erl.Data.List as ErlList
-import Pinto.GenServer as GenServer
 import Pinto.Supervisor (SupervisorPid)
 import Pinto.Supervisor as Supervisor
 import Pinto.Supervisor.Helpers as SupervisorHelpers
 import Pinto.Types (RegistryName(..), StartLinkResult)
+import PurerlExUnit.Reporter as Reporter
 import PurerlExUnit.Suite.Supervisor as SuiteSupervisor
 import PurerlExUnit.Test.Supervisor as TestSupervisor
 
@@ -24,15 +24,12 @@ startLink = Supervisor.startLink (Just $ Local $ atom supervisorName) $ pure sup
   supervisorName = "PurerlExUnit.Supervisor"
   childSpecs =
     ErlList.fromFoldable
-      [ SupervisorHelpers.worker "PurerlExUnit.Suite.Supervisor" SuiteSupervisor.startLink
+      [ SupervisorHelpers.worker "PurerlExUnit.Reporter" Reporter.startLink
+      , SupervisorHelpers.worker "PurerlExUnit.Suite.Supervisor" SuiteSupervisor.startLink
       , SupervisorHelpers.worker "PurerlExUnit.Test.Supervisor" TestSupervisor.startLink
       ]
   flags = { strategy, intensity, period }
   strategy = Supervisor.OneForOne
   intensity = 3
   period = Seconds 5.0
-
-foreign import runner_start_link
-  :: forall cont stop message state
-   . Effect (StartLinkResult (GenServer.ServerPid cont stop message state))
 

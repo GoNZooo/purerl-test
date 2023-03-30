@@ -46,7 +46,6 @@ defmodule PurerlExUnit.Assertion do
       e in ExUnit.AssertionError ->
         e
         |> ExUnit.Formatter.format_assertion_diff(0, 80, &formatter/2)
-        |> IO.inspect(label: "Assertion diff")
         |> Enum.map(fn {key, value} -> {key, Enum.join(value)} end)
         |> Enum.into(%{})
         |> case do

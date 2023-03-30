@@ -7,11 +7,10 @@ import Prelude
 import Control.Monad.Reader as Reader
 import Data.Array as Array
 import Data.Maybe (Maybe(..))
-import Data.Newtype (unwrap, wrap)
+import Data.Newtype (wrap)
 import Data.Traversable (traverse_)
 import Effect (Effect)
 import Effect.Class (class MonadEffect, liftEffect)
-import Effect.Class.Console as Console
 import Effect.Ref as Ref
 import Erl.Atom as Atom
 import Erl.Data.Tuple (tuple2)
@@ -22,10 +21,11 @@ import Pinto (RegistryName(..), StartLinkResult)
 import Pinto.GenServer (Action(..), InfoFn, InitFn, InitResult(..), ServerSpec)
 import Pinto.GenServer as GenServer
 import Pinto.Timer as Timer
+import PurerlExUnit.Reporter as Reporter
 import PurerlExUnit.Suite.Bus as SuiteBus
 import PurerlExUnit.Suite.Types (Arguments, Message(..), Pid, ServerType', State)
 import PurerlExUnit.Test.Supervisor as TestSupervisor
-import PurerlExUnit.Types (AssertionFailure, SuiteName, Test, TestName, TestResult(..), Tests)
+import PurerlExUnit.Types (SuiteName, Test, TestResult(..), Tests)
 
 serverName :: SuiteName -> RegistryName ServerType'
 serverName name =
@@ -63,19 +63,8 @@ handleInfo (IncomingTestResult (TestFailed { test, failures })) state = do
   maybePrintReport newState
   newState # GenServer.return # pure
 handleInfo PrintFinalReport state@{ suite, testCount, successes, failures } = do
-  [ "🧪 ", unwrap suite.name ] # Array.fold # Console.log
-  [ show successes, "/", show testCount, " successes" ] # Array.fold # Console.log
-  failures # traverse_ printFailedTest # liftEffect
+  { suiteName: suite.name, testCount, successes, failures } # Reporter.report # liftEffect
   state # GenServer.returnWithAction StopNormal # pure
-
-printFailedTest :: { test :: TestName, assertions :: Array AssertionFailure } -> Effect Unit
-printFailedTest { test, assertions } = do
-  [ "❌ ", unwrap test ] # Array.fold # Console.log
-  traverse_ printAssertionFailure assertions
-
-printAssertionFailure :: AssertionFailure -> Effect Unit
-printAssertionFailure { message } = do
-  [ "  ", message ] # Array.fold # Console.log
 
 maybePrintReport :: forall m. HasSelf m Message => MonadEffect m => State -> m Unit
 maybePrintReport { successes, failures, testCount } = do
