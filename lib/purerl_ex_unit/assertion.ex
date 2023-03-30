@@ -1,71 +1,80 @@
 defmodule PurerlExUnit.Assertion do
   require ExUnit.Assertions, as: Assertions
 
-  def execute({:assert, true}, _index, _test_name), do: {:assertionPassed}
+  def execute({:assert, true}, _index), do: {:assertionPassed}
 
-  def execute({:assert, false}, index, test_name) do
-    {:assertionFailed, %{index: index, message: "  ❌ #{test_name} [#{index}]"}}
+  def execute({:assert, false}, index) do
+    {:assertionFailed, %{index: index, message: "  ❌ [#{index}]"}}
   end
 
-  def execute({:refute, false}, _index, _test_name), do: {:assertionPassed}
+  def execute({:refute, false}, _index), do: {:assertionPassed}
 
-  def execute({:refute, true}, index, test_name) do
-    {:assertionFailed, %{index: index, message: "  ❌ #{test_name} [#{index}]"}}
+  def execute({:refute, true}, index) do
+    {:assertionFailed, %{index: index, message: "  ❌ [#{index}]"}}
   end
 
-  def execute({:assertEqual, %{left: left, right: right}}, index, test_name) do
-    run_assertion(fn -> Assertions.assert(left == right) end, index, test_name)
+  def execute({:assertEqual, %{left: left, right: right}}, index) do
+    run_assertion(fn -> Assertions.assert(left == right) end, index, right)
   end
 
-  def execute({:assertNotEqual, %{left: left, right: right}}, index, test_name) do
-    run_assertion(fn -> Assertions.assert(left != right) end, index, test_name)
+  def execute({:assertNotEqual, %{left: left, right: right}}, index) do
+    run_assertion(fn -> Assertions.assert(left != right) end, index, right)
   end
 
-  def execute({:assertGreaterThan, %{left: left, right: right}}, index, test_name) do
-    run_assertion(fn -> Assertions.assert(left > right) end, index, test_name)
+  def execute({:assertGreaterThan, %{left: left, right: right}}, index) do
+    run_assertion(fn -> Assertions.assert(left > right) end, index, right)
   end
 
-  def execute({:assertLessThan, %{left: left, right: right}}, index, test_name) do
-    run_assertion(fn -> Assertions.assert(left < right) end, index, test_name)
+  def execute({:assertLessThan, %{left: left, right: right}}, index) do
+    run_assertion(fn -> Assertions.assert(left < right) end, index, right)
   end
 
-  def execute({:assertGreaterThanOrEqual, %{left: left, right: right}}, index, test_name) do
-    run_assertion(fn -> Assertions.assert(left >= right) end, index, test_name)
+  def execute({:assertGreaterThanOrEqual, %{left: left, right: right}}, index) do
+    run_assertion(fn -> Assertions.assert(left >= right) end, index, right)
   end
 
-  def execute({:assertLessThanOrEqual, %{left: left, right: right}}, index, test_name) do
-    run_assertion(fn -> Assertions.assert(left <= right) end, index, test_name)
+  def execute({:assertLessThanOrEqual, %{left: left, right: right}}, index) do
+    run_assertion(fn -> Assertions.assert(left <= right) end, index, right)
   end
 
-  defp run_assertion(assertion_closure, index, test_name) do
+  defp run_assertion(assertion_closure, index, right_value) do
     try do
       assertion_closure.()
 
       {:assertionPassed}
     rescue
       e in ExUnit.AssertionError ->
-        IO.puts("    #{e.message}")
+        e
+        |> ExUnit.Formatter.format_assertion_diff(0, 80, &formatter/2)
+        |> IO.inspect(label: "Assertion diff")
+        |> Enum.map(fn {key, value} -> {key, Enum.join(value)} end)
+        |> Enum.into(%{})
+        |> case do
+          %{left: left, right: right} ->
+            message =
+              failure_message(index, "#{e.message}:\n    Left:\t#{left}\n    Right:\t#{right}")
 
-        %{left: left, right: right} =
-          e
-          |> ExUnit.Formatter.format_assertion_diff(0, 80, &formatter/2)
-          |> Enum.map(fn {key, value} -> {key, Enum.join(value)} end)
-          |> Enum.into(%{})
+            {:assertionFailed, %{index: index, message: message}}
 
-        message = failure_message(test_name, index, "Left:\t#{left}\n    Right:\t#{right}")
+          # This seems to only happen when we have only one value, i.e. they are equal
+          %{left: left} ->
+            message =
+              failure_message(
+                index,
+                "#{e.message}:\n    #{left} == #{right_value}"
+              )
 
-        {:assertionFailed, %{index: index, message: message}}
+            {:assertionFailed, %{index: index, message: message}}
+        end
 
       e ->
-        message = failure_message(test_name, index, "Unknown exception: #{inspect(e)}")
+        message = failure_message(index, "Unknown exception: #{inspect(e)}")
 
         {:assertionFailed, %{index: index, message: message}}
     end
   end
 
-  defp failure_message(test_name, index, extra_data) do
-    "❌ #{test_name} [#{index}]\n    #{extra_data}"
-  end
+  defp failure_message(index, extra_data), do: "❌ [#{index}]\n    #{extra_data}"
 
   defp formatter(:diff_enabled?, _default), do: true
   defp formatter(:diff_delete, msg), do: colorize(:red, msg)

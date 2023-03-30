@@ -57,7 +57,7 @@ runAssertions suiteName testName assertions = do
   assertionsRef <- [] # Ref.new # liftEffect
   Reader.runReaderT assertions assertionsRef
   assertions' <- assertionsRef # Ref.read # liftEffect
-  assertionResults <- traverseWithIndex (\i a -> executeAssertion a i testName) assertions'
+  assertionResults <- traverseWithIndex executeAssertion assertions'
   let assertionFailures = assertionFailureData assertionResults
   if Array.null assertionFailures then
     { test: testName } # TestDone # SuiteBus.send suiteName
@@ -71,7 +71,7 @@ assertionFailureData results = do
     stripFailureData AssertionPassed = Nothing
   results # map stripFailureData # Array.catMaybes
 
-executeAssertion :: Assertion Foreign -> Int -> TestName -> Effect AssertionResult
-executeAssertion assertion index testName = executeAssertion_ assertion index testName
+executeAssertion :: Int -> Assertion Foreign -> Effect AssertionResult
+executeAssertion index assertion = executeAssertion_ assertion index
 
-foreign import executeAssertion_ :: Assertion Foreign -> Int -> TestName -> Effect AssertionResult
+foreign import executeAssertion_ :: Assertion Foreign -> Int -> Effect AssertionResult
