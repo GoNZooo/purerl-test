@@ -10,8 +10,9 @@ import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Ref as Ref
 import Foreign as Foreign
+import PurerlExUnit.Reporter.Bus as ReporterBus
 import PurerlExUnit.Suite.Supervisor as SuiteSupervisor
-import PurerlExUnit.Types (Assertion(..), Assertions, Suite, Suites, Tests)
+import PurerlExUnit.Types (Assertion(..), Assertions, Suite, SuiteStatus(..), Suites, Tests)
 
 runSuites :: Suites -> Effect Unit
 runSuites suitesSpecification = do
@@ -21,7 +22,9 @@ runSuites suitesSpecification = do
   traverse_ runSuite suites
 
 runSuite :: Suite -> Effect Unit
-runSuite suite' = { suite: suite' } # SuiteSupervisor.startChild # void
+runSuite suite' = do
+  ReporterBus.send (ReporterBus.SuiteMessage (SuiteStarted { name: suite'.name }))
+  { suite: suite' } # SuiteSupervisor.startChild # void
 
 suite :: String -> Tests -> Suites
 suite name tests' = do

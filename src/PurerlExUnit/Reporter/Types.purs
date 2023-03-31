@@ -9,10 +9,12 @@ module PurerlExUnit.Reporter.Types
 import Prelude
 
 import Pinto.GenServer (ServerPid, ServerType)
+import PurerlExUnit.Reporter.Bus as ReporterBus
+import PurerlExUnit.Types (SuiteName)
 
-data Message = Unit
+type Message = ReporterBus.Message
 
-type State = {}
+type State = { suitesInFlight :: Array SuiteName, failures :: Int }
 
 type Arguments = {}
 

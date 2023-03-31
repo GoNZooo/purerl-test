@@ -4,6 +4,7 @@ module PurerlExUnit.Types
   , Suites
   , Suite(..)
   , SuiteName(..)
+  , SuiteStatus(..)
   , Tests
   , Test(..)
   , TestName(..)
@@ -44,6 +45,10 @@ derive instance Generic AssertionResult _
 
 instance Show AssertionResult where
   show = genericShow
+
+data SuiteStatus
+  = SuiteStarted { name :: SuiteName }
+  | SuiteDone { name :: SuiteName }
 
 type AssertionFailure = { index :: Int, message :: String }
 

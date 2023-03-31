@@ -1,4 +1,4 @@
-module Test.Main
+module Test.MainSpec
   ( main
   ) where
 

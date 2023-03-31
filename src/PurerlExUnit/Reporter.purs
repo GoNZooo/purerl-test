@@ -16,8 +16,9 @@ import Erl.Atom as Atom
 import Pinto (RegistryName(..), RegistryReference(..), StartLinkResult)
 import Pinto.GenServer (CastFn, InfoFn, InitFn, InitResult(..), ServerSpec)
 import Pinto.GenServer as GenServer
+import PurerlExUnit.Reporter.Bus as ReporterBus
 import PurerlExUnit.Reporter.Types (Message, Pid, ServerType', State)
-import PurerlExUnit.Types (AssertionFailure, SuiteName, TestName)
+import PurerlExUnit.Types (AssertionFailure, SuiteName, SuiteStatus(..), TestName)
 
 serverName :: RegistryName ServerType'
 serverName = "PurerlExUnit.Reporter" # Atom.atom # Local
@@ -31,7 +32,9 @@ spec =
   (GenServer.defaultSpec init) { name = Just serverName, handleInfo = Just handleInfo }
 
 init :: InitFn Unit Unit Message State
-init = {} # InitOk # pure
+init = do
+  _subscriptionRef <- ReporterBus.subscribe identity
+  { suitesInFlight: [], failures: 0 } # InitOk # pure
 
 report
   :: { suiteName :: SuiteName
@@ -54,10 +57,21 @@ handleReport { suiteName, testCount, successes, failures } state = do
   [ "🧪 ", unwrap suiteName ] # Array.fold # Console.log
   [ "  ", show successes, "/", show testCount, " successes" ] # Array.fold # Console.log
   failures # traverse_ printFailedTest # liftEffect
-  state # GenServer.return # pure
+  { name: suiteName } # SuiteDone # ReporterBus.SuiteMessage # ReporterBus.send # liftEffect
+  let failureCount = Array.length failures
+  state { failures = state.failures + failureCount } # GenServer.return # pure
 
 handleInfo :: InfoFn Unit Unit Message State
-handleInfo _unit state = state # GenServer.return # pure
+handleInfo (ReporterBus.SuiteMessage (SuiteStarted { name })) state = do
+  state { suitesInFlight = state.suitesInFlight `Array.snoc` name } # GenServer.return # pure
+handleInfo (ReporterBus.SuiteMessage (SuiteDone { name })) state = do
+  let suitesInFlight = Array.delete name state.suitesInFlight
+  liftEffect $ when (Array.null suitesInFlight) $ do
+    let exitCode = if state.failures > 0 then 1 else 0
+    ReporterBus.send (ReporterBus.AllDone exitCode)
+  state { suitesInFlight = suitesInFlight } # GenServer.return # pure
+handleInfo (ReporterBus.AllDone _exitCode) state = do
+  state # GenServer.return # pure
 
 printFailedTest :: { test :: TestName, assertions :: Array AssertionFailure } -> Effect Unit
 printFailedTest { test, assertions } = do
