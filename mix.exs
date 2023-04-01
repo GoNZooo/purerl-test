@@ -10,7 +10,9 @@ defmodule PurerlTest.MixProject do
       build_embedded: Mix.env() == :prod,
       deps: deps(),
       compilers: [:purerl | Mix.compilers()],
-      erlc_paths: ["output"]
+      erlc_paths: ["output"],
+      package: package(),
+      docs: docs()
     ]
   end
 
@@ -31,5 +33,29 @@ defmodule PurerlTest.MixProject do
       {:gproc, "~> 0.9.0"},
       {:purerl_alias, "~> 0.1.3"}
     ]
+  end
+
+  defp package() do
+    [
+      maintainers: ["Rickard Andersson"],
+      licenses: ["MIT"],
+      links: %{
+        "GitHub" => "https://github.com/GoNZooo/purerl-test"
+      },
+      files: [
+        "lib",
+        "mix.exs",
+        "README.md",
+        "LICENSE",
+        "src",
+        "spago.dhall",
+        "packages.dhall",
+        "test"
+      ]
+    ]
+  end
+
+  defp docs() do
+    [main: "PurerlTest"]
   end
 end
