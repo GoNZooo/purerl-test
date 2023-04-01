@@ -6,11 +6,13 @@ defmodule PurerlTest do
 
   1. Add `purerl_test` to your `mix.exs` dependencies.
 
-      def deps do
-        [
-          {:purerl_test, "~> 0.1.0"}
-        ]
-      end
+  ```elixir
+  def deps do
+    [
+      {:purerl_test, "~> 0.1.0"}
+    ]
+  end
+  ```
 
   2. Add `purerl-test` to your PureScript dependencies:
 
@@ -43,7 +45,7 @@ defmodule PurerlTest do
 
   ## Usage
 
-  ```purescript
+  ```haskell
   module Test.MainSpec
     ( main
     ) where
