@@ -1,4 +1,4 @@
-module PurerlExUnit.Suite.Bus
+module PurerlTest.Suite.Bus
   ( subscribe
   , unsubscribe
   , send
@@ -9,7 +9,7 @@ import Prelude
 import Effect (Effect)
 import Effect.Class (class MonadEffect)
 import Erl.Process (class HasSelf)
-import PurerlExUnit.Types (SuiteName, TestResult)
+import PurerlTest.Types (SuiteName, TestResult)
 import SimpleBus (Bus, SubscriptionRef)
 import SimpleBus as SimpleBus
 

@@ -1,4 +1,4 @@
-module PurerlExUnit.Test
+module PurerlTest.Test
   ( startLink
   ) where
 
@@ -18,9 +18,9 @@ import Pinto (RegistryName(..), StartLinkResult)
 import Pinto.GenServer (InfoFn, InitFn, InitResult(..), ServerSpec)
 import Pinto.GenServer as GenServer
 import Pinto.Timer as Timer
-import PurerlExUnit.Suite.Bus as SuiteBus
-import PurerlExUnit.Test.Types (Arguments, Message(..), Pid, ServerType', State)
-import PurerlExUnit.Types
+import PurerlTest.Suite.Bus as SuiteBus
+import PurerlTest.Test.Types (Arguments, Message(..), Pid, ServerType', State)
+import PurerlTest.Types
   ( Assertion
   , AssertionResult(..)
   , Assertions
@@ -31,7 +31,7 @@ import PurerlExUnit.Types
 
 serverName :: SuiteName -> TestName -> RegistryName ServerType'
 serverName suiteName testName =
-  { server: "PurerlExUnit.Test", suite: suiteName, test: testName } # Foreign.unsafeToForeign # Global
+  { server: "PurerlTest.Test", suite: suiteName, test: testName } # Foreign.unsafeToForeign # Global
 
 startLink :: Arguments -> Effect (StartLinkResult Pid)
 startLink arguments = do

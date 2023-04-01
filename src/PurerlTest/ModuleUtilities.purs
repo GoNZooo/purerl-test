@@ -1,4 +1,4 @@
-module PurerlExUnit.ModuleUtilities
+module PurerlTest.ModuleUtilities
   ( findPureScriptSpecModules
   , pureScriptModuleToErlangModule
   ) where

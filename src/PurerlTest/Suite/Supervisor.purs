@@ -1,4 +1,4 @@
-module PurerlExUnit.Suite.Supervisor
+module PurerlTest.Suite.Supervisor
   ( startLink
   , startChild
   ) where
@@ -17,14 +17,14 @@ import Pinto.Supervisor
   , crashIfChildNotRunning
   )
 import Pinto.Supervisor.SimpleOneForOne as Supervisor
-import PurerlExUnit.Suite as Suite
-import PurerlExUnit.Suite.Types as SuiteTypes
+import PurerlTest.Suite as Suite
+import PurerlTest.Suite.Types as SuiteTypes
 
 type SupervisorType = Supervisor.SupervisorType SuiteTypes.Arguments SuiteTypes.Pid
 type Pid = Supervisor.SupervisorPid SuiteTypes.Arguments SuiteTypes.Pid
 
 name :: RegistryName SupervisorType
-name = "PurerlExUnit.Suite.Supervisor" # Atom.atom # Local
+name = "PurerlTest.Suite.Supervisor" # Atom.atom # Local
 
 startLink :: Effect (StartLinkResult Pid)
 startLink = do

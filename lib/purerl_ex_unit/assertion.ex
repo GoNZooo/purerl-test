@@ -1,4 +1,4 @@
-defmodule PurerlExUnit.Assertion do
+defmodule PurerlTest.Assertion do
   require ExUnit.Assertions, as: Assertions
 
   def execute({:assert, true}, _index), do: {:assertionPassed}

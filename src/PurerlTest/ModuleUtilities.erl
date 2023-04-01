@@ -1,4 +1,4 @@
--module(purerlExUnit_moduleUtilities@foreign).
+-module(purerlTest_moduleUtilities@foreign).
 
 -export([lowerCaseLetter/1, upperCaseLetter/1, wildcard/1]).
 

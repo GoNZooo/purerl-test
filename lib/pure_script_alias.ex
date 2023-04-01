@@ -3,7 +3,7 @@ defmodule PureScriptAlias do
   Allows one to alias PureScript module names in Elixir and thus use them with nicer names.
   """
 
-  @utilities :purerlExUnit_moduleUtilities@ps
+  @utilities :purerlTest_moduleUtilities@ps
 
   defmacro alias(purescript_module_name, options \\ []) do
     aliased_name =

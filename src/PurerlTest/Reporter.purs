@@ -1,4 +1,4 @@
-module PurerlExUnit.Reporter
+module PurerlTest.Reporter
   ( startLink
   , report
   ) where
@@ -16,12 +16,12 @@ import Erl.Atom as Atom
 import Pinto (RegistryName(..), RegistryReference(..), StartLinkResult)
 import Pinto.GenServer (CastFn, InfoFn, InitFn, InitResult(..), ServerSpec)
 import Pinto.GenServer as GenServer
-import PurerlExUnit.Reporter.Bus as ReporterBus
-import PurerlExUnit.Reporter.Types (Message, Pid, ServerType', State)
-import PurerlExUnit.Types (AssertionFailure, SuiteName, SuiteStatus(..), TestName)
+import PurerlTest.Reporter.Bus as ReporterBus
+import PurerlTest.Reporter.Types (Message, Pid, ServerType', State)
+import PurerlTest.Types (AssertionFailure, SuiteName, SuiteStatus(..), TestName)
 
 serverName :: RegistryName ServerType'
-serverName = "PurerlExUnit.Reporter" # Atom.atom # Local
+serverName = "PurerlTest.Reporter" # Atom.atom # Local
 
 startLink :: Effect (StartLinkResult Pid)
 startLink = do

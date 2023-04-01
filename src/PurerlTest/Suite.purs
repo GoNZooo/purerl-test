@@ -1,4 +1,4 @@
-module PurerlExUnit.Suite
+module PurerlTest.Suite
   ( startLink
   ) where
 
@@ -21,15 +21,15 @@ import Pinto (RegistryName(..), StartLinkResult)
 import Pinto.GenServer (Action(..), InfoFn, InitFn, InitResult(..), ServerSpec)
 import Pinto.GenServer as GenServer
 import Pinto.Timer as Timer
-import PurerlExUnit.Reporter as Reporter
-import PurerlExUnit.Suite.Bus as SuiteBus
-import PurerlExUnit.Suite.Types (Arguments, Message(..), Pid, ServerType', State)
-import PurerlExUnit.Test.Supervisor as TestSupervisor
-import PurerlExUnit.Types (SuiteName, Test, TestResult(..), Tests)
+import PurerlTest.Reporter as Reporter
+import PurerlTest.Suite.Bus as SuiteBus
+import PurerlTest.Suite.Types (Arguments, Message(..), Pid, ServerType', State)
+import PurerlTest.Test.Supervisor as TestSupervisor
+import PurerlTest.Types (SuiteName, Test, TestResult(..), Tests)
 
 serverName :: SuiteName -> RegistryName ServerType'
 serverName name =
-  name # tuple2 (Atom.atom "PurerlExUnit.Suite") # Foreign.unsafeToForeign # Global
+  name # tuple2 (Atom.atom "PurerlTest.Suite") # Foreign.unsafeToForeign # Global
 
 startLink :: Arguments -> Effect (StartLinkResult Pid)
 startLink arguments = do

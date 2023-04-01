@@ -1,4 +1,4 @@
-module PurerlExUnit.Types
+module PurerlTest.Types
   ( TestResult(..)
   , AssertionFailure(..)
   , Suites

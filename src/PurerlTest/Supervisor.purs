@@ -1,4 +1,4 @@
-module PurerlExUnit.Supervisor
+module PurerlTest.Supervisor
   ( startLink
   ) where
 
@@ -13,20 +13,20 @@ import Pinto.Supervisor (SupervisorPid)
 import Pinto.Supervisor as Supervisor
 import Pinto.Supervisor.Helpers as SupervisorHelpers
 import Pinto.Types (RegistryName(..), StartLinkResult)
-import PurerlExUnit.Reporter as Reporter
-import PurerlExUnit.Suite.Supervisor as SuiteSupervisor
-import PurerlExUnit.Test.Supervisor as TestSupervisor
+import PurerlTest.Reporter as Reporter
+import PurerlTest.Suite.Supervisor as SuiteSupervisor
+import PurerlTest.Test.Supervisor as TestSupervisor
 
 startLink :: Effect (StartLinkResult SupervisorPid)
 startLink = Supervisor.startLink (Just $ Local $ atom supervisorName) $ pure supervisorSpec
   where
   supervisorSpec = { childSpecs, flags }
-  supervisorName = "PurerlExUnit.Supervisor"
+  supervisorName = "PurerlTest.Supervisor"
   childSpecs =
     ErlList.fromFoldable
-      [ SupervisorHelpers.worker "PurerlExUnit.Reporter" Reporter.startLink
-      , SupervisorHelpers.worker "PurerlExUnit.Suite.Supervisor" SuiteSupervisor.startLink
-      , SupervisorHelpers.worker "PurerlExUnit.Test.Supervisor" TestSupervisor.startLink
+      [ SupervisorHelpers.worker "PurerlTest.Reporter" Reporter.startLink
+      , SupervisorHelpers.worker "PurerlTest.Suite.Supervisor" SuiteSupervisor.startLink
+      , SupervisorHelpers.worker "PurerlTest.Test.Supervisor" TestSupervisor.startLink
       ]
   flags = { strategy, intensity, period }
   strategy = Supervisor.OneForOne

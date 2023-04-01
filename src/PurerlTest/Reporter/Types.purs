@@ -1,4 +1,4 @@
-module PurerlExUnit.Test.Types
+module PurerlTest.Reporter.Types
   ( Message(..)
   , ServerType'
   , Pid
@@ -9,14 +9,14 @@ module PurerlExUnit.Test.Types
 import Prelude
 
 import Pinto.GenServer (ServerPid, ServerType)
-import PurerlExUnit.Types (SuiteName, Test)
+import PurerlTest.Reporter.Bus as ReporterBus
+import PurerlTest.Types (SuiteName)
 
-data Message = Initialize
+type Message = ReporterBus.Message
 
-type State = { suiteName :: SuiteName, test :: Test }
+type State = { suitesInFlight :: Array SuiteName, failures :: Int }
 
-type Arguments = { suiteName :: SuiteName, test :: Test }
+type Arguments = {}
 
 type ServerType' = ServerType Unit Unit Message State
-
 type Pid = ServerPid Unit Unit Message State

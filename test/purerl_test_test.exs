@@ -1,3 +1,3 @@
-defmodule PurerlExUnitTest do
+defmodule PurerlTestTest do
   :test_main@ps.main().()
 end

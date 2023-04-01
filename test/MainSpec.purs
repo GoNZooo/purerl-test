@@ -9,7 +9,7 @@ import Effect (Effect)
 import Erl.Atom as Atom
 import Erl.Data.List as List
 import Erl.Data.Map as Map
-import PurerlExUnit
+import PurerlTest
   ( assert
   , assertEqual
   , assertGreaterThan

@@ -1,4 +1,4 @@
-module PurerlExUnit where
+module PurerlTest where
 
 import Prelude
 
@@ -10,9 +10,9 @@ import Effect (Effect)
 import Effect.Class (liftEffect)
 import Effect.Ref as Ref
 import Foreign as Foreign
-import PurerlExUnit.Reporter.Bus as ReporterBus
-import PurerlExUnit.Suite.Supervisor as SuiteSupervisor
-import PurerlExUnit.Types (Assertion(..), Assertions, Suite, SuiteStatus(..), Suites, Tests)
+import PurerlTest.Reporter.Bus as ReporterBus
+import PurerlTest.Suite.Supervisor as SuiteSupervisor
+import PurerlTest.Types (Assertion(..), Assertions, Suite, SuiteStatus(..), Suites, Tests)
 
 runSuites :: Suites -> Effect Unit
 runSuites suitesSpecification = do

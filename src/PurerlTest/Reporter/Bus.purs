@@ -1,4 +1,4 @@
-module PurerlExUnit.Reporter.Bus
+module PurerlTest.Reporter.Bus
   ( subscribe
   , unsubscribe
   , send
@@ -12,7 +12,7 @@ import Effect.Class (class MonadEffect)
 import Erl.Atom (Atom)
 import Erl.Atom as Atom
 import Erl.Process (class HasSelf)
-import PurerlExUnit.Types (SuiteStatus)
+import PurerlTest.Types (SuiteStatus)
 import SimpleBus (Bus, SubscriptionRef)
 import SimpleBus as SimpleBus
 
@@ -21,7 +21,7 @@ data Message
   | AllDone Int
 
 name :: Atom
-name = Atom.atom "PurerlExUnit.Reporter.Bus"
+name = Atom.atom "PurerlTest.Reporter.Bus"
 
 bus :: Bus Atom Message
 bus = SimpleBus.bus name

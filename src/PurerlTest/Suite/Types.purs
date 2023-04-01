@@ -1,4 +1,4 @@
-module PurerlExUnit.Suite.Types
+module PurerlTest.Suite.Types
   ( Message(..)
   , ServerType'
   , Pid
@@ -9,7 +9,7 @@ module PurerlExUnit.Suite.Types
 import Prelude
 
 import Pinto.GenServer (ServerPid, ServerType)
-import PurerlExUnit.Types (AssertionFailure, Suite, TestName, TestResult)
+import PurerlTest.Types (AssertionFailure, Suite, TestName, TestResult)
 
 data Message
   = Initialize

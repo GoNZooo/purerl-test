@@ -5,7 +5,7 @@ defmodule Mix.Tasks.Purerl.Test do
 
   require PureScriptAlias
 
-  PureScriptAlias.alias(PurerlExUnit.ModuleUtilities)
+  PureScriptAlias.alias(PurerlTest.ModuleUtilities)
 
   @impl Mix.Task
   def run(_args) do
@@ -19,8 +19,8 @@ defmodule Mix.Tasks.Purerl.Test do
   end
 
   defp initialize_environment() do
-    Application.ensure_all_started(:purerl_ex_unit)
-    :gproc.reg({:p, :l, :"PurerlExUnit.Reporter.Bus"})
+    Application.ensure_all_started(:purerl_test)
+    :gproc.reg({:p, :l, :"PurerlTest.Reporter.Bus"})
   end
 
   defp receive_until_done() do
