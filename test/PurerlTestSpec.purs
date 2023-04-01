@@ -1,4 +1,4 @@
-module Test.MainSpec
+module Test.PurerlTestSpec
   ( main
   ) where
 
