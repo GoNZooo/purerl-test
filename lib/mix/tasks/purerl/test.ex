@@ -3,7 +3,7 @@ defmodule Mix.Tasks.Purerl.Test do
 
   use Mix.Task
 
-  require PureScriptAlias
+  require PurerlAlias.Alias, as: PureScriptAlias
 
   PureScriptAlias.alias(PurerlTest.ModuleUtilities)
 
