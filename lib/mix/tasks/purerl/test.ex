@@ -3,16 +3,16 @@ defmodule Mix.Tasks.Purerl.Test do
 
   use Mix.Task
 
-  require PurerlAlias.Alias, as: PureScriptAlias
+  require PurerlAlias
 
-  PureScriptAlias.alias(PurerlTest.ModuleUtilities)
+  PurerlAlias.alias(PurerlTest.ModuleUtilities, as: Utilities)
 
   @impl Mix.Task
   def run(_args) do
     initialize_environment()
 
-    ModuleUtilities.findPureScriptSpecModules().()
-    |> Enum.map(&ModuleUtilities.pureScriptModuleToErlangModule/1)
+    Utilities.findPureScriptSpecModules().()
+    |> Enum.map(&Utilities.pureScriptModuleToErlangModule/1)
     |> Enum.each(fn module -> module.main().() end)
 
     receive_until_done()
