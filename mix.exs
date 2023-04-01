@@ -38,6 +38,7 @@ defmodule PurerlTest.MixProject do
   defp package() do
     [
       maintainers: ["Rickard Andersson"],
+      description: "A testing library for PureScript (`purerl`) projects.",
       licenses: ["MIT"],
       links: %{
         "GitHub" => "https://github.com/GoNZooo/purerl-test"
