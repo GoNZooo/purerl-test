@@ -31,7 +31,8 @@ defmodule PurerlTest.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:purerlex, "~> 0.4.2"},
       {:gproc, "~> 0.9.0"},
-      {:purerl_alias, "~> 0.1.3"}
+      {:purerl_alias, "~> 0.1.3"},
+      {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
 
