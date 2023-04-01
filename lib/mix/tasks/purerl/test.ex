@@ -11,7 +11,7 @@ defmodule Mix.Tasks.Purerl.Test do
   def run(_args) do
     initialize_environment()
 
-    find_purescript_spec_modules()
+    ModuleUtilities.findPureScriptSpecModules().()
     |> Enum.map(&ModuleUtilities.pureScriptModuleToErlangModule/1)
     |> Enum.each(fn module -> module.main().() end)
 
@@ -35,12 +35,5 @@ defmodule Mix.Tasks.Purerl.Test do
       _other ->
         receive_until_done()
     end
-  end
-
-  defp find_purescript_spec_modules() do
-    Path.wildcard("test/**/*Spec.purs")
-    |> Enum.map(fn path ->
-      ModuleUtilities.pureScriptFileToPureScriptModule(%{prefix: {:just, "Test."}}, path)
-    end)
   end
 end

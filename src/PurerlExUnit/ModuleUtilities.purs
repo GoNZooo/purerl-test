@@ -1,6 +1,6 @@
 module PurerlExUnit.ModuleUtilities
-  ( pureScriptModuleToErlangModule
-  , pureScriptFileToPureScriptModule
+  ( findPureScriptSpecModules
+  , pureScriptModuleToErlangModule
   ) where
 
 import Prelude
@@ -10,8 +10,16 @@ import Data.Maybe as Maybe
 import Data.Newtype (wrap)
 import Data.String (CodePoint, Pattern)
 import Data.String as String
+import Effect (Effect)
 import Erl.Atom (Atom)
 import Erl.Atom as Atom
+import Erl.Data.List (List)
+
+findPureScriptSpecModules :: Effect (List String)
+findPureScriptSpecModules = do
+  "test/**/*Spec.purs"
+    # wildcard
+    # map (map (pureScriptFileToPureScriptModule { prefix: Just "Test." }))
 
 pureScriptModuleToErlangModule :: String -> Atom
 pureScriptModuleToErlangModule module' = do
@@ -46,9 +54,6 @@ stripSuffixIfPresent suffix s = do
 lowerCaseFirstLetter :: String -> String
 lowerCaseFirstLetter s = modifyFirstLetter lowerCaseLetter s
 
-upperCaseFirstLetter :: String -> String
-upperCaseFirstLetter s = modifyFirstLetter upperCaseLetter s
-
 modifyFirstLetter :: (CodePoint -> CodePoint) -> String -> String
 modifyFirstLetter f s =
   case String.uncons s of
@@ -57,3 +62,4 @@ modifyFirstLetter f s =
 
 foreign import lowerCaseLetter :: CodePoint -> CodePoint
 foreign import upperCaseLetter :: CodePoint -> CodePoint
+foreign import wildcard :: String -> Effect (List String)
