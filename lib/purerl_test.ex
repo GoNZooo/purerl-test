@@ -48,7 +48,7 @@ defmodule PurerlTest do
   Create test suites that run automatically by placing them in your `test` directory (at any
   depth) and naming them with the suffix `Spec.purs`.
 
-  ```haskell
+  ```purescript
   module Test.MainSpec
     ( main
     ) where
