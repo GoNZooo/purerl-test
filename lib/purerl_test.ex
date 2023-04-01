@@ -45,6 +45,9 @@ defmodule PurerlTest do
 
   ## Usage
 
+  Create test suites that run automatically by placing them in your `test` directory (at any
+  depth) and naming them with the suffix `Spec.purs`.
+
   ```haskell
   module Test.MainSpec
     ( main
@@ -115,7 +118,7 @@ defmodule PurerlTest do
           assertNotEqual (List.fromFoldable [ 1, 2, 3 ]) (List.fromFoldable [ 1, 2, 4 ])
   ```
 
-  Via the CLI:
+  Via the CLI you can then run `mix purerl.test` and it will pick up those test suites and run them:
 
   ```bash
   $ mix purerl.test
@@ -129,5 +132,11 @@ defmodule PurerlTest do
     2/2 successes
   🎉 All done!
   ```
+
+  ## Execution
+
+  All test suites are executed in parallel in separate processes. The individual tests in those test
+  suites are also executed in separate processes. This is not (currently) something you can
+  configure and is perhaps unlikely to ever be.
   """
 end
