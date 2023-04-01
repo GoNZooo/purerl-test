@@ -10,6 +10,7 @@ defmodule Mix.Tasks.Purerl.Test do
 
   @impl Mix.Task
   def run(arguments) do
+    Mix.Task.run("compile")
     debug? = "debug" in arguments
 
     if debug? do
