@@ -99,7 +99,8 @@ in  upstream
 -------------------------------
 -}
 let upstream =
-      https://github.com/purerl/package-sets/releases/download/erl-0.15.3-20220629/packages.dhall sha256:48ee9f3558c00e234eae6b8f23b4b8b66eb9715c7f2154864e1e425042a0723b
+      https://github.com/purerl/package-sets/releases/download/erl-0.15.3-20220629/packages.dhall
+        sha256:48ee9f3558c00e234eae6b8f23b4b8b66eb9715c7f2154864e1e425042a0723b
 
 let erl-quickcheck-helpers =
       https://raw.githubusercontent.com/quanterall/purescript-erl-quickcheck-helpers/v0.0.4/spago.dhall
@@ -107,6 +108,7 @@ let erl-quickcheck-helpers =
 
 let purerl-alias =
       https://raw.githubusercontent.com/GoNZooo/purerl-alias/v0.1.4/spago.dhall
+        sha256:5310f905193ce9a0ee7d9073e7a5b1af28cff1ee21e53a83758f4d864760d099
 
 let overrides =
       { erl-quickcheck-helpers =
@@ -114,13 +116,13 @@ let overrides =
             "https://github.com/quanterall/purescript-erl-quickcheck-helpers.git"
         , version = "v0.0.4"
         , dependencies = erl-quickcheck-helpers.dependencies
-        },
-        erl-simplebus =
+        }
+      , erl-simplebus =
         { dependencies = upstream.erl-simplebus.dependencies
         , repo = "https://github.com/id3as/purescript-erl-simplebus.git"
         , version = "551cb2e110f70bf470825d0912c06c48e71867bc"
-        },
-        purerl-alias =
+        }
+      , purerl-alias =
         { dependencies = purerl-alias.dependencies
         , repo = "https://github.com/GoNZooo/purerl-alias.git"
         , version = "v0.1.4"
