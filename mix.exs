@@ -4,7 +4,7 @@ defmodule PurerlTest.MixProject do
   def project do
     [
       app: :purerl_test,
-      version: "0.1.5",
+      version: "0.1.6",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       build_embedded: Mix.env() == :prod,
@@ -47,7 +47,7 @@ defmodule PurerlTest.MixProject do
       # {:dep_from_git, git: "https://github.com/elixir-lang/my_dep.git", tag: "0.1.0"}
       {:purerlex, "~> 0.4.2", only: [:dev, :test]},
       {:gproc, "~> 0.9.0"},
-      {:purerl_alias, "~> 0.1.4"},
+      {:purerl_alias, "~> 0.1.4", only: [:dev, :test], env: Mix.env()},
       {:ex_doc, ">= 0.0.0", only: :dev, runtime: false}
     ]
   end
