@@ -9,7 +9,6 @@ import Effect (Effect)
 import Erl.Atom as Atom
 import Erl.Data.List as List
 import Erl.Data.Map as Map
-import PurerlAlias.ModuleUtilities as ModuleUtilities
 import PurerlTest
   ( assert
   , assertEqual
@@ -66,10 +65,3 @@ main = do
       test "`assertEqual` & `assertNotEqual` with lists" do
         assertEqual (List.fromFoldable [ 1, 2, 3 ]) (List.fromFoldable [ 1, 2, 3 ])
         assertNotEqual (List.fromFoldable [ 1, 2, 3 ]) (List.fromFoldable [ 1, 2, 4 ])
-
-    suite "PurerlAlias" do
-      test "ModuleUtilities" do
-        assertEqual
-          (ModuleUtilities.pureScriptModuleToErlangModule "Test.PurerlTestSpec")
-          (Atom.atom "test_purerlTestSpec@ps")
-
