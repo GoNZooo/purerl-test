@@ -6,6 +6,7 @@ import Prelude
 
 import Data.Tuple.Nested ((/\))
 import Effect (Effect)
+import Erl.Atom (Atom)
 import Erl.Atom as Atom
 import Erl.Data.List as List
 import Erl.Data.Map as Map
@@ -65,3 +66,5 @@ main = do
       test "`assertEqual` & `assertNotEqual` with lists" do
         assertEqual (List.fromFoldable [ 1, 2, 3 ]) (List.fromFoldable [ 1, 2, 3 ])
         assertNotEqual (List.fromFoldable [ 1, 2, 3 ]) (List.fromFoldable [ 1, 2, 4 ])
+
+foreign import crash :: Atom -> Effect Unit

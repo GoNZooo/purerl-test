@@ -4,7 +4,7 @@ defmodule PurerlTest.MixProject do
   def project do
     [
       app: :purerl_test,
-      version: "0.1.9",
+      version: "0.1.10",
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
       build_embedded: Mix.env() == :prod,
