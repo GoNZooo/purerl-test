@@ -34,7 +34,7 @@ defmodule Mix.Tasks.Purerl.Test do
 
   defp initialize_environment() do
     Application.ensure_all_started(:purerl_test)
-    :gproc.reg({:p, :l, :"PurerlTest.Reporter.Bus"})
+    :gproc.ensure_reg({:p, :l, :"PurerlTest.Reporter.Bus"})
   end
 
   defp receive_until_done(debug?) do
